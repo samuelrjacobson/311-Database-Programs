@@ -1,0 +1,449 @@
+class Node {
+    String data;
+    Node left;
+    Node right;
+    Node prev;
+    boolean leftThread;
+    boolean rightThread;
+
+    public Node(String data) {
+        this.data = data;
+        this.left = null;
+        this.right = null;
+        this.prev = null;
+        this.leftThread = false;
+        this.rightThread = false;
+    }
+}
+
+public class DoublyThreadedBST {
+    private Node root;
+
+    public DoublyThreadedBST() {
+        this.root = null;
+    }
+
+    public boolean isEmpty() {
+        return (this.root == null);
+    }
+
+    public void insert(String data) {
+        Node newNode = new Node(data);
+        if (isEmpty()) {
+            root = newNode;
+            return;
+        }
+
+        Node current = root;
+        while (true) {
+            if (data.compareTo(current.data) < 0) {
+                if (current.leftThread) {
+                    newNode.prev = current.prev;
+                    newNode.left = current.left;
+                    newNode.right = current;
+                    current.left = newNode;
+                    current.leftThread = false;
+                    return;
+                } else {
+                    current = current.left;
+                }
+            } else {
+                if (current.rightThread) {
+                    newNode.prev = current;
+                    newNode.left = current;
+                    newNode.right = current.right;
+                    current.right = newNode;
+                    current.rightThread = false;
+                    return;
+                } else {
+                    current = current.right;
+                }
+            }
+        }
+    }
+
+    public Node find(String data) {
+        if (isEmpty()) {
+            return null;
+        }
+
+        Node current = root;
+        while (current != null) {
+            if (data.equals(current.data)) {
+                return current;
+            } else if (data.compareTo(current.data) < 0) {
+                if (current.leftThread) {
+                    return null;
+                } else {
+                    current = current.left;
+                }
+            } else {
+                if (current.rightThread) {
+                    return null;
+                } else {
+                    current = current.right;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public void delete(String data) {
+        Node current = root;
+        Node parent = null;
+
+        while (current != null) {
+            if (data.equals(current.data)) {
+                break;
+            } else if (data.compareTo(current.data) < 0) {
+                if (current.leftThread) {
+                    return;
+                } else {
+                    parent = current;
+                    current = current.left;
+                }
+            } else {
+                if (current.rightThread) {
+                    return;
+                } else {
+                    parent = current;
+                    current = current.right;
+                }
+            }
+        }
+
+        if (current == null) {
+            return;
+        }
+
+        if (current.leftThread && current.rightThread) {
+            if (parent == null) {
+                root = null;
+            } else if (current == parent.left) {
+                parent.leftThread = true;
+                parent.left = current.left;
+                current.left = null;
+                current.leftThread = true;
+            } else {
+                parent.rightThread = true;
+                parent.right = current.right;
+                current.right = null;
+                current.rightThread = true;
+            }
+        } else if (current.leftThread) {
+            if (parent == null) {
+                root = current.right;
+                root.prev = null;
+            } else if (current == parent.left) {
+                parent.left = current.right;
+                current.right.prev = parent;
+                parent.leftThread = true;
+            } else {
+                parent.right = current
+
+
+
+
+
+
+
+
+
+
+public class Node {
+    String data;
+    int where;
+    Node left, right;
+    boolean leftThread, rightThread;
+
+    public Node(String data, int where) {
+        this.data = data;
+        this.where = where;
+        leftThread = rightThread = true;
+    }
+}
+
+public class DoublyThreadedBinarySearchTree {
+    private Node root;
+
+    public void delete(String data, int where) {
+        Node current = root, parent = null;
+        boolean isLeftChild = false;
+
+        // Search for the node to delete
+        while (current != null) {
+            if (data.compareTo(current.data) < 0) {
+                if (!current.leftThread) {
+                    parent = current;
+                    current = current.left;
+                    isLeftChild = true;
+                } else {
+                    break;
+                }
+            } else if (data.compareTo(current.data) > 0) {
+                if (!current.rightThread) {
+                    parent = current;
+                    current = current.right;
+                    isLeftChild = false;
+                } else {
+                    break;
+                }
+            } else { // found the node with the string data
+                if (current.where == where) { // found the correct node
+                    if (!current.leftThread && !current.rightThread) { // node has two children
+                        Node successor = findSuccessor(current);
+                        successor.left = current.left;
+                        successor.leftThread = current.leftThread;
+                        successor.right = current.right;
+                        successor.rightThread = current.rightThread;
+
+                        // update the threads of the successor's children
+                        if (!successor.leftThread) {
+                            successor.left.right = successor;
+                        }
+                        if (!successor.rightThread) {
+                            successor.right.left = successor;
+                        }
+
+                        // update the parent's child reference
+                        if (parent == null) {
+                            root = successor;
+                        } else if (isLeftChild) {
+                            parent.left = successor;
+                        } else {
+                            parent.right = successor;
+                        }
+                    } else { // node has one child or no children
+                        Node child = (current.leftThread ? current.right : current.left);
+
+                        // update the child's thread
+                        if (!current.leftThread) {
+                            child.right = current.right;
+                        }
+                        if (!current.rightThread) {
+                            child.left = current.left;
+                        }
+
+                        // update the parent's child reference
+                        if (parent == null) {
+                            root = child;
+                        } else if (isLeftChild) {
+                            parent.left = child;
+                        } else {
+                            parent.right = child;
+                        }
+                    }
+                    return;
+                } else if (where < current.where) {
+                    if (!current.leftThread) {
+                        parent = current;
+                        current = current.left;
+                        isLeftChild = true;
+                    } else {
+                        break;
+                    }
+                } else {
+                    if (!current.rightThread) {
+                        parent = current;
+                        current = current.right;
+                        isLeftChild = false;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private Node findSuccessor(Node node) {
+        if (node.rightThread) {
+            return node.right;
+        } else {
+            Node current = node.right;
+            while (!current.leftThread) {
+                current = current.left;
+            }
+            return current;
+        }
+    }
+}
+
+
+code didn't work:
+find method
+//System.out.println("finding");
+		/*Node current = root;
+        while (current != null) {
+            if (key.equals(current.getData())) {
+                return current;
+            }
+            else if (key.compareTo(current.getData()) < 0) {
+                if (current.leftIsThread()) {
+                    return null;
+                }
+                else {
+                    current = current.getLeftChild();
+                }
+            }
+            else {
+                if (current.rightIsThread()) {
+                    return null;
+                }
+                else {
+                    current = current.getRightChild();
+                }
+            }
+        }
+
+        return null;*/
+
+not using--non-threaded
+//inorder traversal of BST--recursive
+	public void listByIDAscending(Node localRoot) {
+		if(localRoot != null) {
+			listByIDAscending(localRoot.leftChild);
+			
+			System.out.println(localRoot.getData());
+			listByIDAscending(localRoot.rightChild);
+		}
+		
+	}
+	
+
+didn't work
+insert method
+/*
+			Node parent;
+			while(true) {
+				parent = current;
+				// go left
+				System.out.println("inside while");
+				if(current == null) System.out.println("CURRENT IS NULL");
+				else System.out.println("NOT NULL");
+				if(newNode.getData().compareTo(current.getData()) < 0) {
+					System.out.println("left");
+					current = current.getLeftChild();
+					//if(current == null) {
+					// if we want to insert as parent's left child
+					if(parent.leftIsThread()) {
+						System.out.println("parent thread");
+						if(current.rightIsThread()) {
+							current.setRightChild(newNode);
+						}
+						current.setRightChild(newNode);
+						parent.setLeftChild(newNode);
+						parent.setLeftIsThread(false);
+						newNode.setLeftChild(current);
+						newNode.setLeftIsThread(true);
+						newNode.setRightChild(parent);
+						newNode.setRightIsThread(true);
+						size++;
+
+						return;
+					}
+					// if parent = leftmost Node
+					else if(current == null) {
+						System.out.println("null current");
+						parent.setLeftChild(newNode);
+						parent.setLeftIsThread(false);
+						newNode.setRightChild(parent);
+						newNode.setRightIsThread(true);
+						size++;
+
+						return;
+					}
+				}
+				// or go right
+				else {
+					System.out.println("right");
+					current = current.getRightChild();
+					//if(current == null) {
+					if(parent.rightIsThread()) {
+						System.out.println("parent thread");
+						if(current.leftIsThread()) {
+							current.setLeftChild(newNode);
+						}
+						parent.setRightChild(newNode);
+						parent.setRightIsThread(false);
+						newNode.setLeftChild(parent);
+						newNode.setLeftIsThread(true);
+						newNode.setRightChild(current);
+						newNode.setRightIsThread(true);
+						size++;
+
+						return;
+					}
+					else if(current == null) {
+						System.out.println("null current");
+						parent.setRightChild(newNode);
+						parent.setRightIsThread(false);
+						newNode.setLeftChild(parent);
+						newNode.setLeftIsThread(true);
+						size++;
+
+						return;
+					}
+				} //end go right
+			} //end while
+		} //end tree isn't empty
+		System.out.print("size " + size);
+		*/
+		
+
+delete method segments--didnt work
+/*
+		// if the node is the leftmost node
+		else if(current.getLeftChild() == null) {
+			if(!current.rightIsThread()) parent.setLeftChild(current.getRightChild());
+			else parent.setLeftChild(current.getLeftChild());
+		}
+		*/
+		
+
+/*
+		// if the node has no children
+		if(current.getLeftChild() == null && current.getRightChild() == null)
+			if(current == root) root = null;
+			else if (isLeftChild) parent.leftChild = null;
+			else parent.rightChild = null;
+		// else if the node has a left child but no right child
+		else if(current.rightChild == null) {
+			if(current == root) root = current.leftChild;
+			else if(isLeftChild) parent.leftChild = current.leftChild;
+			else parent.rightChild = current.leftChild;
+		}
+		// else if the node has a right child but no left child
+		else if(current.leftChild == null) {
+			if(current == root) root = current.rightChild;
+			else if(isLeftChild) parent.leftChild = current.rightChild;
+			else parent.rightChild = current.rightChild;
+		}
+		else { // node has two children
+			Node successor = getSuccessor(current, true);
+		
+			if(current == root) root = successor;
+			else if(isLeftChild) parent.leftChild = successor;
+			else parent.rightChild = successor;
+			successor.leftChild = current.leftChild;
+		}*/
+		
+
+getSuccessor--didnt work
+		/*
+		Node successorParent = origNode;
+		Node successor = origNode;
+		Node current = origNode.rightChild;
+		
+		while(current != null) {
+			successorParent = successor;
+			successor = current;
+			current = current.leftChild;
+		}
+		if(deleting && successor != origNode.rightChild) {
+			successorParent.leftChild = successor.rightChild;
+			successor.rightChild = origNode.rightChild;
+		}
+		return successor;*/
+		
+		

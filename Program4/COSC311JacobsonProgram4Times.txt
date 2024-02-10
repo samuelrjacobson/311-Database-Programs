@@ -1,0 +1,4 @@
+		QuickSort	HeapSort	MergeSort
+Ascending	17ms		2ms		0ms
+Random		4ms		17ms		3ms
+Descending	37ms		2ms		1ms
